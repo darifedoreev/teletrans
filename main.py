@@ -67,13 +67,12 @@ def set_preferences(update,context):
             user_preference[user] = msg
         except:
             user_preference[user] = msg
-        with open('userdata.csv', 'w', newline='') as csvfile:
+        with open('userdata.csv', 'a', newline='') as csvfile:
             writer = csv.writer(
                 csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            for i in range(1):
-                listn = [update.message.from_user.first_name, msg]
-                print(listn)
-                writer.writerow([update.message.from_user.first_name, msg])        
+            listn = [update.message.from_user.first_name, msg]
+            print(listn)
+            writer.writerow([update.message.from_user.first_name, msg])        
         text_message = str(msg.lower()) + " выбран языком перевода для " + update.message.from_user.first_name
         context.bot.send_message(chat_id=update.effective_chat.id, text = text_message)
 
