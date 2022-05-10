@@ -30,17 +30,16 @@ def start(update, context):
         rows.append(row)
     print(rows)
     user = update.message.from_user.username
+    msgs = list()
     for row in rows:
         row = row[0].split(';')
         if row[0] == update.message.from_user.first_name:
             print(row)
             msg = row[1]
-            try:
-                user_preference[user] = msg
-            except:
-                user_preference[user] = msg
-            text_message = 'Ваш текущий язык перевода — ' + str(msg.lower()) + '. Для смены введите команду /lang.'
-            context.bot.send_message(chat_id=update.effective_chat.id, text = text_message)
+            msgs.append(msg)
+    msg = msgs[-1]
+    text_message = 'Ваш текущий язык перевода — ' + str((translator.translate(msg,dest = 'Russian')).text) + '. Для смены введите команду /lang.'
+    context.bot.send_message(chat_id=update.effective_chat.id, text = text_message)
             
             
 
@@ -73,7 +72,7 @@ def set_preferences(update,context):
             listn = [update.message.from_user.first_name, msg]
             print(listn)
             writer.writerow([update.message.from_user.first_name, msg])        
-        text_message = str(msg.lower()) + " выбран языком перевода для " + update.message.from_user.first_name
+        text_message = str((translator.translate(msg,dest = 'Russian')).text) + " выбран языком перевода для " + update.message.from_user.first_name
         context.bot.send_message(chat_id=update.effective_chat.id, text = text_message)
 
 def translate(update,context):
@@ -113,7 +112,7 @@ def check_language(update,context):
         msg = msg.strip()
         language = translator.detect(msg)
         lang_text = all_lang[language.lang.lower()]
-        send_message = "Язык: " + str(lang_text.upper()) 
+        send_message = "Язык: " + str((translator.translate(lang_text, dest = 'Russian')).text)
         context.bot.send_message(chat_id = update.effective_chat.id, text = send_message)
 
 def main():
