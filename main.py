@@ -3,6 +3,8 @@ from telegram import ReplyKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters 
 import googletrans
 from googletrans import Translator
+import csv
+
 
 translator = Translator()
 
@@ -21,6 +23,26 @@ langcodes = dict(map(reversed,all_lang.items()))
 def start(update, context):
     message = "Привет, " + update.message.from_user.first_name + '. Я — бот-переводчик. Напиши /help, чтобы узнать, как я работаю.'
     context.bot.send_message(chat_id=update.effective_chat.id, text=message, reply_markup=markup_1)
+    file = open('userdata.csv')
+    reader = csv.reader(file)
+    rows = []
+    for row in reader:
+        rows.append(row)
+    print(rows)
+    user = update.message.from_user.username
+    for row in rows:
+        row = row[0].split(';')
+        if row[0] == update.message.from_user.first_name:
+            print(row)
+            msg = row[1]
+            try:
+                user_preference[user] = msg
+            except:
+                user_preference[user] = msg
+            text_message = 'Ваш текущий язык перевода — ' + str(msg.lower()) + '. Для смены введите команду /lang.'
+            context.bot.send_message(chat_id=update.effective_chat.id, text = text_message)
+            
+            
 
 def check_lang(update,context):
     user = update.message.from_user.username
@@ -45,7 +67,14 @@ def set_preferences(update,context):
             user_preference[user] = msg
         except:
             user_preference[user] = msg
-        text_message = str(msg.upper()) + " выбран языком перевода для " + update.message.from_user.first_name
+        with open('userdata.csv', 'w', newline='') as csvfile:
+            writer = csv.writer(
+                csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            for i in range(1):
+                listn = [update.message.from_user.first_name, msg]
+                print(listn)
+                writer.writerow([update.message.from_user.first_name, msg])        
+        text_message = str(msg.lower()) + " выбран языком перевода для " + update.message.from_user.first_name
         context.bot.send_message(chat_id=update.effective_chat.id, text = text_message)
 
 def translate(update,context):
